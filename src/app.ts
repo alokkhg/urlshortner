@@ -3,9 +3,11 @@ import Controller from './interface/controller.interface'
 import constants from '../settings.json'
 import helmet from 'helmet'
 import cors from 'cors'
-import { logresp } from './middleware/logger'
+import { logresp } from './middleware/logger.middleware'
 import { CorsOptions } from 'cors'
 import compression from 'compression'
+import errorMiddleware from './middleware/error.middleware'
+import HttpException from './exceptions/http.exception'
 
 
 var corsopts: CorsOptions;
@@ -31,6 +33,7 @@ class App {
         // this.connectDatabase();
         this.initializeMiddleware();
         this.initializeControllers(controllers);
+        this.initializeErrorHandling();
     }
 
 
@@ -38,6 +41,10 @@ class App {
     private initializeControllers(controllers: Controller[]) {
         controllers.forEach((controller) => {
             this.app.use('/', controller.router);
+            this.app.use((req:express.Request, res:express.Response, next:express.NextFunction) => {
+                var error = new HttpException(404, "This url is not correct")
+                next(error)
+            })
         })
     }
 
@@ -50,26 +57,15 @@ class App {
         
     }
 
+    private initializeErrorHandling() {
+        this.app.use(errorMiddleware);
+    }
 
     public listen() {
         this.app.listen(constants.port, () => {
             console.log("Server started working on port ", constants.port);
         });
     }
-
-
-    // private connectDatabase() {
-    //     const connectString = `mongodb://${constants.dbuser}:${constants.dbpass}@${constants.dbpath}/training`;
-    //     const connection = mongoose.connect(connectString, {
-    //         useNewUrlParser: true,
-    //         useUnifiedTopology: true
-    //     });
-
-    //     connection.catch((err) => {
-    //         console.log("Error in connecting to database", err);
-    //         process.exit(1);
-    //     })
-    // }
 }
 
 export default App;
