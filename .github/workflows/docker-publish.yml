@@ -19,8 +19,6 @@ jobs:
           registry: docker.pkg.github.com
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      - name: take out docker tags
-        uses: 
       - name: Build container images
         uses: docker/build-push-action@v2
         with: 
