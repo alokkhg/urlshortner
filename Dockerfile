@@ -13,7 +13,7 @@ RUN npm prune --production
 FROM node:14-alpine
 
 WORKDIR /usr/src/app
-COPY --from=BUILD_IMAGE /usr/src/app/dist ./dist
+COPY --from=BUILD_IMAGE /usr/src/app/ ./dist
 COPY --from=BUILD_IMAGE /usr/src/app/node_modules ./node_modules
 
 EXPOSE 9000
